@@ -1,0 +1,55 @@
+import cv2
+import matplotlib.pyplot as plt
+
+# Camara
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("Error al acceder a la cámara.")
+    exit()
+
+print("Presiona '1' para tomar una selfie :D.")
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Error al tomar la foto:(.")
+        break
+
+    # Mostrar la camara en vivo de la cámara
+    cv2.imshow("Cámara", frame)
+
+    # Presionar '1' para tomar la foto o '0' para salir
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('1'):
+        img = frame
+        print("Imagen capturada.")
+        break
+    elif key == ord('0'):
+        print("Saliendo sin la foto.")
+        cap.release()
+        cv2.destroyAllWindows()
+        exit()
+
+# Apagar la cámara y cerrar la ventana
+cap.release()
+cv2.destroyAllWindows()
+
+# Convertir a escala de grises
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Mostrar imagen original
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.title("Imagen Original")
+plt.axis('off')
+plt.show()
+
+# Mostrar imagen en escala de grises
+plt.imshow(gray_img, cmap='gray')
+plt.title("Imagen en Escala de Grises")
+plt.axis('off')
+plt.show()
+
+# Guardar imagen en escala de grises
+cv2.imwrite('imagen_en_grises_camara.jpg', gray_img)
+print("Imagen en escala de grises guardada como 'imagen_en_grises_camara.jpg'.")
