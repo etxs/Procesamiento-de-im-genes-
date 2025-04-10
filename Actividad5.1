@@ -1,0 +1,49 @@
+import cv2
+import matplotlib.pyplot as plt
+
+# Camara
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("Error al acceder a la cámara.")
+    exit()
+
+print("Presiona '1' para tomar una selfie :D.")
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Error al tomar la foto:(.")
+        break
+
+    # Mostrar la camara en vivo de la cámara
+    cv2.imshow("Cámara", frame)
+
+    # Presionar '1' para tomar la foto o '0' para salir
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('1'):
+        img = frame
+        print("Imagen capturada.")
+        break
+    elif key == ord('0'):
+        print("Saliendo sin la foto.")
+        cap.release()
+        cv2.destroyAllWindows()
+        exit()
+
+# Quitar la cámara y cerrar la ventana
+cap.release()
+cv2.destroyAllWindows()
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+# Convertir la imagen a escala de grises
+gray_face_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# Detectar rostros
+faces = face_cascade.detectMultiScale(gray_face_img, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+# Dibujar rectángulos alrededor de los rostros detectados
+for (x, y, w, h) in faces:cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 3)
+# Mostrar la imagen con los rostros detectados
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.title("Detección de Rostros")
+plt.axis('off')
+plt.show()
