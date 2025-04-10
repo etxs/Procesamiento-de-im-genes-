@@ -1,0 +1,55 @@
+import cv2
+import matplotlib.pyplot as plt
+
+# Camara
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("Error al acceder a la cámara.")
+    exit()
+
+print("Presiona '1' para tomar una selfie :D.")
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Error al tomar la foto:(.")
+        break
+
+    # Mostrar la camara en vivo de la cámara
+    cv2.imshow("Cámara", frame)
+
+    # Presionar '1' para tomar la foto o '0' para salir
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('1'):
+        img = frame
+        print("Imagen capturada.")
+        break
+    elif key == ord('0'):
+        print("Saliendo sin la foto.")
+        cap.release()
+        cv2.destroyAllWindows()
+        exit()
+
+# Apaga la cámara y cerrar la ventana
+cap.release()
+cv2.destroyAllWindows()
+
+# Convertir la imagen a escala de grises
+gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Aplicar detección de bordes (Canny)
+edges_img = cv2.Canny(gray_img, 100, 200)
+
+# Encontrar contornos
+contours, _ = cv2.findContours(edges_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+# Dibujar los contornos sobre la imagen original
+contour_img = img.copy()
+cv2.drawContours(contour_img, contours, -1, (0, 255, 0), 3)
+
+# Mostrar la imagen con los contornos
+plt.imshow(cv2.cvtColor(contour_img, cv2.COLOR_BGR2RGB))
+plt.title("Detección de Contornos")
+plt.axis('off')
+plt.show()
